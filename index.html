@@ -1,0 +1,497 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Let's Calculate</title>
+
+<style>
+body{
+margin:0;
+font-family:Arial, sans-serif;
+height:100vh;
+display:flex;
+justify-content:center;
+align-items:center;
+color:#fff;
+transition:.3s;
+}
+
+/* Backgrounds */
+.bg-start{background:linear-gradient(135deg,#6e63d9,#7d68d7);}
+.bg-dash{background:linear-gradient(135deg,#2b5876,#4e4376);}
+.bg-calc{background:linear-gradient(135deg,#614385,#516395);}
+.bg-age{background:linear-gradient(135deg,#1d976c,#93f9b9);}
+.bg-time{background:linear-gradient(135deg,#ff6a88,#ff99ac);}
+.bg-history{background:linear-gradient(135deg,#1e3c72,#2a5298);}
+
+/* Card */
+.box{
+width:390px;
+background:rgba(255,255,255,.15);
+backdrop-filter:blur(12px);
+padding:25px;
+border-radius:18px;
+box-shadow:0 10px 25px rgba(0,0,0,.3);
+display:none;
+}
+
+.active{display:block;}
+
+h2{text-align:center;margin-top:0;}
+
+input,select{
+width:100%;
+padding:11px;
+margin:7px 0;
+border-radius:10px;
+border:none;
+font-size:15px;
+background:#fff;
+color:#000;
+}
+
+button{
+width:100%;
+padding:10px;
+margin-top:7px;
+border:none;
+border-radius:10px;
+font-weight:bold;
+cursor:pointer;
+background:#7b6ef6;
+color:#fff;
+transition:.2s;
+}
+
+button:hover{background:#9a90ff;}
+
+.result{
+margin-top:10px;
+padding:12px;
+background:#ffffff;
+color:#000;
+border-radius:10px;
+font-weight:bold;
+font-size:16px;
+text-align:center;
+min-height:40px;
+border:2px solid #7b6ef6;
+}
+
+.calcGrid{
+display:grid;
+grid-template-columns:repeat(4,1fr);
+gap:8px;
+margin-top:10px;
+}
+
+.calcGrid button{
+background:#fff;
+color:#000;
+}
+
+
+.historyItem{
+background:rgba(255,255,255,.2);
+padding:6px;
+border-radius:6px;
+margin:5px 0;
+display:flex;
+justify-content:space-between;
+}
+
+.smallBtn{
+width:auto;
+padding:3px 8px;
+background:#ff5c7a;
+}
+
+.backBtn{
+position:fixed;
+bottom:20px;
+left:20px;
+width:auto;
+padding:8px 15px;
+background:#ff5c7a;
+border:none;
+border-radius:8px;
+color:#fff;
+cursor:pointer;
+display:none;
+}
+</style>
+</head>
+
+<body class="bg-start">
+
+<!-- START -->
+<div class="box active" id="startPage">
+<h2>Let's Calculate</h2>
+<button onclick="show('dashboard')">Start</button>
+</div>
+
+<!-- DASHBOARD -->
+<div class="box" id="dashboard">
+<h2>Dashboard</h2>
+<button onclick="show('calcMenu')">Calculator</button>
+<button onclick="show('ageMenu')">Age Calculator</button>
+<button onclick="show('timeMenu')">Time Calculator</button>
+<button onclick="show('historyPage');loadHistory()">History</button>
+<button onclick="show('startPage')" style="background:#ff5c7a;">Exit</button>
+</div>
+
+<!-- CALC MENU -->
+<div class="box" id="calcMenu">
+<h2>Calculator</h2>
+<button onclick="show('typeCalc')">Type Calculator</button>
+<button onclick="show('uiCalc')">UI Calculator</button>
+</div>
+
+<!-- TYPE CALC -->
+<div class="box" id="typeCalc">
+<h2>Type Calculator</h2>
+<input id="typeInput" placeholder="Example: 5+6*2">
+<button onclick="typeCalculate()">Calculate</button>
+<button onclick="clearType()">Clear</button>
+<div class="result" id="typeResult"></div>
+</div>
+
+<!-- UI CALC -->
+<div class="box" id="uiCalc">
+<h2>UI Calculator</h2>
+<input id="display" readonly>
+<div class="calcGrid">
+<button onclick="add('7')">7</button>
+<button onclick="add('8')">8</button>
+<button onclick="add('9')">9</button>
+<button onclick="add('/')">/</button>
+<button onclick="add('4')">4</button>
+<button onclick="add('5')">5</button>
+<button onclick="add('6')">6</button>
+<button onclick="add('*')">*</button>
+<button onclick="add('1')">1</button>
+<button onclick="add('2')">2</button>
+<button onclick="add('3')">3</button>
+<button onclick="add('-')">-</button>
+<button onclick="add('0')">0</button>
+<button onclick="add('.')">.</button>
+<button onclick="calcUI()">=</button>
+<button onclick="add('+')">+</button>
+</div>
+<button onclick="clearDisplay()">Clear</button>
+</div>
+
+<!-- AGE MENU -->
+<div class="box" id="ageMenu">
+<h2>Age Calculator</h2>
+<button onclick="show('agePage')">Calculate Age</button>
+<button onclick="show('dateDiffPage')">Between Two Dates</button>
+</div>
+
+<!-- AGE -->
+<div class="box" id="agePage">
+<h2>Calculate Age</h2>
+<input type="date" id="dob">
+<button onclick="calculateAge()">Calculate</button>
+<button onclick="clearAge()">Clear</button>
+<div class="result" id="ageResult"></div>
+</div>
+
+<!-- DATE DIFF -->
+<div class="box" id="dateDiffPage">
+<h2>Date Difference</h2>
+<input type="date" id="d1">
+<input type="date" id="d2">
+<button onclick="dateDiff()">Calculate</button>
+<button onclick="clearDateDiff()">Clear</button>
+<div class="result" id="dateResult"></div>
+</div>
+
+<!-- TIME MENU -->
+<div class="box" id="timeMenu">
+<h2>Time Calculator</h2>
+<button onclick="show('timeCurrentPage')">From Current Time</button>
+<button onclick="show('timeBetweenPage')">Between Two Times</button>
+</div>
+
+<!-- TIME CURRENT -->
+<div class="box" id="timeCurrentPage">
+<h2>From Current Time</h2>
+<input type="number" id="curh" placeholder="Hour (1-12)">
+<input type="number" id="curm" placeholder="Minute (0-59)">
+<select id="curampm"><option>AM</option><option>PM</option></select>
+<button onclick="timeFromCurrent()">Calculate</button>
+<button onclick="clearTime()">Clear</button>
+<div class="result" id="timeCurrentResult"></div>
+</div>
+
+<!-- TIME BETWEEN -->
+<div class="box" id="timeBetweenPage">
+<h2>Between Two Times</h2>
+<input type="number" id="h1" placeholder="Start Hour (1-12)">
+<input type="number" id="m1" placeholder="Start Minute (0-59)">
+<select id="ampm1"><option>AM</option><option>PM</option></select>
+<input type="number" id="h2" placeholder="End Hour (1-12)">
+<input type="number" id="m2" placeholder="End Minute (0-59)">
+<select id="ampm2"><option>AM</option><option>PM</option></select>
+<button onclick="timeBetween()">Calculate</button>
+<button onclick="clearTime()">Clear</button>
+<div class="result" id="timeBetweenResult"></div>
+</div>
+
+<!-- HISTORY -->
+<div class="box" id="historyPage">
+<h2>History</h2>
+<div id="historyList"></div>
+<button onclick="clearHistory()">Clear History</button>
+</div>
+
+<button class="backBtn" id="backBtn" onclick="goBack()">Back</button>
+
+<script>
+let current="startPage";
+const backBtn=document.getElementById("backBtn");
+function typeCalculate(){
+    let exp = document.getElementById("typeInput").value;
+
+    if(exp.trim()==""){
+        document.getElementById("typeResult").innerText="Enter expression";
+        return;
+    }
+
+    try{
+        let result = eval(exp);
+        document.getElementById("typeResult").innerText = result;
+        saveHistory(exp + " = " + result);
+    }catch{
+        document.getElementById("typeResult").innerText="Invalid Expression";
+    }
+}
+
+function clearType(){
+    document.getElementById("typeInput").value="";
+    document.getElementById("typeResult").innerText="";
+}
+function add(val){
+    display.value += val;
+}
+
+function calcUI(){
+    try{
+        let result = eval(display.value);
+        saveHistory(display.value + " = " + result);
+        display.value = result;
+    }catch{
+        display.value="Error";
+    }
+}
+
+
+function clearDisplay(){
+    display.value="";
+}
+function calculateAge(){
+    let dob = new Date(document.getElementById("dob").value);
+
+    if(!dob.getTime()){
+        document.getElementById("ageResult").innerText="Select valid date";
+        return;
+    }
+
+    let today = new Date();
+
+    let years = today.getFullYear() - dob.getFullYear();
+    let months = today.getMonth() - dob.getMonth();
+    let days = today.getDate() - dob.getDate();
+
+    if(days < 0){
+        months--;
+        days += new Date(today.getFullYear(), today.getMonth(), 0).getDate();
+    }
+
+    if(months < 0){
+        years--;
+        months += 12;
+    }
+
+    let output = years + " Years " + months + " Months " + days + " Days";
+    document.getElementById("ageResult").innerText = output;
+    saveHistory("Age: " + output);
+}
+
+function clearAge(){
+    document.getElementById("dob").value="";
+    document.getElementById("ageResult").innerText="";
+}
+
+function show(id){
+document.querySelectorAll(".box").forEach(b=>b.classList.remove("active"));
+document.getElementById(id).classList.add("active");
+current=id;
+setBG(id);
+backBtn.style.display=(id=="startPage"||id=="dashboard")?"none":"block";
+}
+
+function goBack(){
+
+    if(current === "typeCalc" || current === "uiCalc"){
+        show("calcMenu");
+    }
+
+    else if(current === "calcMenu"){
+        show("dashboard");
+    }
+
+    else if(current === "agePage" || current === "dateDiffPage"){
+        show("ageMenu");
+    }
+
+    else if(current === "ageMenu"){
+        show("dashboard");
+    }
+
+    else if(current === "timeCurrentPage" || current === "timeBetweenPage"){
+        show("timeMenu");
+    }
+
+    else if(current === "timeMenu"){
+        show("dashboard");
+    }
+
+    else if(current === "historyPage"){
+        show("dashboard");
+    }
+
+    else{
+        show("dashboard");
+    }
+}
+
+function setBG(id){
+document.body.className="";
+if(id=="startPage") document.body.classList.add("bg-start");
+else if(id=="dashboard") document.body.classList.add("bg-dash");
+else if(id.includes("calc")) document.body.classList.add("bg-calc");
+else if(id.includes("age")||id.includes("date")) document.body.classList.add("bg-age");
+else if(id.includes("time")) document.body.classList.add("bg-time");
+else if(id=="historyPage") document.body.classList.add("bg-history");
+}
+
+/* History */
+function saveHistory(text){
+let h=JSON.parse(localStorage.getItem("history")||"[]");
+h.push(text);
+localStorage.setItem("history",JSON.stringify(h));
+}
+function loadHistory(){
+let list=document.getElementById("historyList");
+list.innerHTML="";
+let h=JSON.parse(localStorage.getItem("history")||"[]");
+h.forEach((x,i)=>{
+list.innerHTML+=`<div class="historyItem">${x}<button class="smallBtn" onclick="deleteHistory(${i})">X</button></div>`;
+});
+}
+function deleteHistory(i){
+let h=JSON.parse(localStorage.getItem("history")||"[]");
+h.splice(i,1);
+localStorage.setItem("history",JSON.stringify(h));
+loadHistory();
+}
+function clearHistory(){localStorage.removeItem("history");loadHistory();}
+
+/* Time Functions */
+function convertTo24(h,a){
+h=parseInt(h);
+if(a=="PM"&&h!=12)h+=12;
+if(a=="AM"&&h==12)h=0;
+return h;
+}
+function dateDiff(){
+
+    let d1 = new Date(document.getElementById("d1").value);
+    let d2 = new Date(document.getElementById("d2").value);
+
+    if(!d1.getTime() || !d2.getTime()){
+        document.getElementById("dateResult").innerText="Select valid dates";
+        return;
+    }
+
+    let diff = Math.abs(d2 - d1);
+
+    let days = Math.floor(diff / (1000 * 60 * 60 * 24));
+    let years = Math.floor(days / 365);
+    let months = Math.floor((days % 365) / 30);
+    let remainingDays = (days % 365) % 30;
+
+    let output = years + " Years " + months + " Months " + remainingDays + " Days";
+
+    document.getElementById("dateResult").innerText = output;
+
+    saveHistory("Date Difference: " + output);
+}
+function clearDateDiff(){
+    document.getElementById("d1").value="";
+    document.getElementById("d2").value="";
+    document.getElementById("dateResult").innerText="";
+}
+
+function timeBetween(){
+let h1v=convertTo24(h1.value,ampm1.value);
+let h2v=convertTo24(h2.value,ampm2.value);
+let m1v=parseInt(m1.value);
+let m2v=parseInt(m2.value);
+
+if(isNaN(h1v)||isNaN(h2v)||isNaN(m1v)||isNaN(m2v)){
+document.getElementById("timeBetweenResult").innerText="Enter valid time";
+return;
+}
+
+let t1=h1v*60+m1v;
+let t2=h2v*60+m2v;
+if(t2<t1)t2+=1440;
+
+let diff=t2-t1;
+let hrs=Math.floor(diff/60);
+let mins=diff%60;
+
+let output="Difference: "+hrs+" hr "+mins+" min";
+document.getElementById("timeBetweenResult").innerText=output;
+saveHistory(output);
+}
+
+function timeFromCurrent(){
+let now=new Date();
+let currentMin=now.getHours()*60+now.getMinutes();
+
+let hv=convertTo24(curh.value,curampm.value);
+let mv=parseInt(curm.value);
+
+if(isNaN(hv)||isNaN(mv)){
+document.getElementById("timeCurrentResult").innerText="Enter valid time";
+return;
+}
+
+let userMin=hv*60+mv;
+if(userMin<currentMin)userMin+=1440;
+
+let diff=userMin-currentMin;
+let hrs=Math.floor(diff/60);
+let mins=diff%60;
+
+let output="From now: "+hrs+" hr "+mins+" min";
+document.getElementById("timeCurrentResult").innerText=output;
+saveHistory(output);
+}
+
+function clearTime(){
+document.getElementById("timeCurrentResult").innerText="";
+document.getElementById("timeBetweenResult").innerText="";
+curh.value="";curm.value="";
+h1.value="";m1.value="";
+h2.value="";m2.value="";
+}
+</script>
+
+</body>
+</html>
